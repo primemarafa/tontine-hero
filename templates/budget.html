@@ -1,0 +1,82 @@
+﻿{% extends "base.html" %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+  <div>
+    <h1 style="font-size:1.6rem; font-weight:800; letter-spacing:-0.02em; color:#ffffff;">Mon Portefeuille & Budget</h1>
+    <p style="font-size:0.85rem; color:#94a3b8; margin-top:0.25rem;">Suivi des entrées, sorties et tontines.</p>
+  </div>
+  <button onclick="openModal('addTransactionModal')" class="btn btn-primary">
+    + Opération
+  </button>
+</div>
+
+<!-- 3 KPI Cards -->
+<div class="card" style="padding:1.25rem;">
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1.25rem; margin-bottom:1rem;">
+    <div>
+      <div style="font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">Total Entrées</div>
+      <div style="font-size:1.5rem; font-weight:800; color:#34d399; margin-top:0.25rem;">
+        +{{ total_income|currency(profile.currency) }}
+      </div>
+    </div>
+    <div>
+      <div style="font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">Total Sorties</div>
+      <div style="font-size:1.5rem; font-weight:800; color:#fb7185; margin-top:0.25rem;">
+        -{{ total_expense|currency(profile.currency) }}
+      </div>
+    </div>
+    <div>
+      <div style="font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">Alloué aux tontines</div>
+      <div style="font-size:1.5rem; font-weight:800; color:#fde68a; margin-top:0.25rem;">
+        {{ tontine_contributions|currency(profile.currency) }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="desktop-grid-2">
+  <!-- History -->
+  <div class="card">
+    <h3 style="font-size:1.05rem; font-weight:800; color:#ffffff; margin-bottom:1rem;">Historique Complet ({{ transactions|length }})</h3>
+
+    {% for tx in transactions %}
+      {% set is_income = (tx.type in ['income', 'tontine_payout']) %}
+      <div class="tx-item">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <div class="tx-icon-box {% if is_income %}tx-income{% else %}tx-expense{% endif %}">
+            {% if is_income %}↑{% else %}↓{% endif %}
+          </div>
+          <div>
+            <div style="font-size:0.95rem; font-weight:700; color:#ffffff;">{{ tx.description }}</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">{{ tx.category }} • {{ tx.date|date_fr }}</div>
+          </div>
+        </div>
+        <div style="font-size:1rem; font-weight:800; color:{% if is_income %}#34d399{% else %}#ffffff{% endif %};">
+          {% if is_income %}+{% else %}-{% endif %}{{ tx.amount|currency(profile.currency) }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Expense Categories -->
+  <div class="card">
+    <h3 style="font-size:1.05rem; font-weight:800; color:#ffffff; margin-bottom:1rem;">Dépenses par Catégorie</h3>
+
+    <div style="display:flex; flex-direction:column; gap:0.85rem;">
+      {% for cat, amt in categories.items() %}
+        {% set pct = (amt / total_expense * 100)|round|int if total_expense > 0 else 0 %}
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:700; color:#e2e8f0;">
+            <span>{{ cat }}</span>
+            <span>{{ amt|currency(profile.currency) }} ({{ pct }}%)</span>
+          </div>
+          <div class="progress-bar-bg" style="height:8px; margin-top:0.35rem;">
+            <div class="progress-bar-fill" style="width: {{ pct }}%; background:#34d399;"></div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

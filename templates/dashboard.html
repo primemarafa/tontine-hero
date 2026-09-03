@@ -1,0 +1,185 @@
+﻿{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Card: Solde & Actions -->
+<div class="card card-hero">
+  <div class="hero-wrapper">
+    <div>
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <span class="balance-label">Solde Disponible</span>
+        <span style="font-size:0.75rem; font-weight:700; color:#34d399; background:rgba(52, 211, 153, 0.15); padding:0.2rem 0.5rem; border-radius:6px;">
+          Actif
+        </span>
+      </div>
+
+      <div class="balance-amount">
+        {{ profile.balance|currency(profile.currency) }}
+      </div>
+
+      <div class="balance-sub">
+        <span>Revenus mensuels :</span>
+        <strong style="color:#ffffff;">{{ profile.monthly_income|currency(profile.currency) }}</strong>
+        <span style="margin:0 0.4rem;">•</span>
+        <span>Série : <strong style="color:#fde68a;">{{ profile.streak_days }} jours 🔥</strong></span>
+      </div>
+    </div>
+
+    <div class="btn-grid">
+      <button onclick="openModal('addTransactionModal')" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        <span>+ Opération</span>
+      </button>
+      <a href="/tontines" class="btn btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <span>Mes Tontines</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- 4 Key Metrics Row (2 cols on mobile, 4 on desktop) -->
+<div class="metric-row">
+  <!-- Next Due -->
+  <div class="metric-box">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="metric-title">À Cotiser</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    </div>
+    {% if next_payment %}
+      <div class="metric-val" style="color:#d97706;">{{ next_payment.amount|currency(profile.currency) }}</div>
+      <div class="metric-desc">{{ next_payment.tontine_name }} • {{ next_payment.due_date|date_fr }}</div>
+    {% else %}
+      <div class="metric-val" style="color:#059669;">À jour ✓</div>
+      <div class="metric-desc">Toutes les cotisations réglées</div>
+    {% endif %}
+  </div>
+
+  <!-- Next Payout -->
+  <div class="metric-box">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="metric-title">Prochain Gain</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+    </div>
+    {% if next_payout %}
+      <div class="metric-val" style="color:#059669;">{{ next_payout.amount|currency(profile.currency) }}</div>
+      <div class="metric-desc">Tour {{ next_payout.round }} • {{ next_payout.due_date|date_fr }}</div>
+    {% else %}
+      <div class="metric-val" style="color:#64748b;">Planifié</div>
+      <div class="metric-desc">En attente de tour</div>
+    {% endif %}
+  </div>
+
+  <!-- Total Savings -->
+  <div class="metric-box">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="metric-title">Épargne Projets</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2h0V5z"></path><circle cx="9" cy="11" r="1"></circle></svg>
+    </div>
+    <div class="metric-val" style="color:#38bdf8;">{{ total_savings|currency(profile.currency) }}</div>
+    <div class="metric-desc">{{ goals|length }} objectifs en cours</div>
+  </div>
+
+  <!-- Safe Daily Spend -->
+  <div class="metric-box">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="metric-title">Reste Quotidien Sûr</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+    </div>
+    <div class="metric-val" style="color:#34d399;">~{{ safe_daily|currency(profile.currency) }}<span style="font-size:0.75rem; font-weight:normal; color:#94a3b8;">/j</span></div>
+    <div class="metric-desc">Budget maîtrisé</div>
+  </div>
+</div>
+
+<!-- Desktop 2-Columns Grid -->
+<div class="desktop-grid-2">
+  <!-- Left Column: Tontines -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <h3 style="font-size:1.05rem; font-weight:800; color:#ffffff;">Mes Tontines en Cours</h3>
+      <a href="/tontines" style="font-size:0.8rem; font-weight:700; color:#34d399; text-decoration:none;">Tout gérer →</a>
+    </div>
+
+    {% for t in tontines %}
+      {% set curr_cycle = t.cycles[t.current_cycle_index] if t.cycles else None %}
+      {% set paid_count = 0 %}
+      {% if curr_cycle %}
+        {% for m_id, p in curr_cycle.payments.items() %}
+          {% if p.paid == 1 %}
+            {% set paid_count = paid_count + 1 %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% set pct = (paid_count / t.members|length * 100)|round|int if t.members else 0 %}
+
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:16px; padding:1.25rem; margin-bottom:1rem;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <span class="tontine-role-tag {% if t.role == 'organizer' %}organizer{% endif %}">
+              Tour {{ curr_cycle.round_number if curr_cycle else 1 }} / {{ t.cycles|length }} • {{ t.frequency }}
+            </span>
+            <h4 style="font-size:1.05rem; font-weight:800; color:#ffffff; margin-top:0.35rem;">{{ t.name }}</h4>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:1.1rem; font-weight:800; color:#34d399;">
+              {{ curr_cycle.target_amount|currency(profile.currency) if curr_cycle else 0 }}
+            </span>
+            <div style="font-size:0.75rem; color:#94a3b8;">{{ t.contribution_amount|currency(profile.currency) }}/membre</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:#cbd5e1; margin-top:0.75rem;">
+          <span>Bénéficiaire : <strong style="color:#ffffff;">{{ curr_cycle.beneficiary.name if curr_cycle and curr_cycle.beneficiary else 'N/A' }}</strong></span>
+          <span style="color:#34d399; font-weight:700;">{{ paid_count }}/{{ t.members|length }} validés</span>
+        </div>
+
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width: {{ pct }}%;"></div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Right Column: Recent Transactions & Health Score -->
+  <div>
+    <!-- Health Score Card -->
+    <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border:1px solid #334155;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <h3 style="font-size:0.95rem; font-weight:800; color:#ffffff;">Score de Sérénité</h3>
+        <span style="font-size:1.5rem; font-weight:900; color:#34d399;">
+          {{ health_score.score }}<span style="font-size:0.85rem; color:#94a3b8;">/100</span>
+        </span>
+      </div>
+      <div class="progress-bar-bg" style="height:6px; margin-bottom:0.75rem;">
+        <div class="progress-bar-fill" style="width: {{ health_score.score }}%;"></div>
+      </div>
+      <p style="font-size:0.8rem; color:#94a3b8;">{{ health_score.level }} — {{ health_score.label }}</p>
+    </div>
+
+    <!-- Recent Operations -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <h3 style="font-size:0.95rem; font-weight:800; color:#ffffff;">Dernières Opérations</h3>
+        <a href="/budget" style="font-size:0.75rem; font-weight:700; color:#34d399; text-decoration:none;">Historique</a>
+      </div>
+
+      {% for tx in transactions %}
+        {% set is_income = (tx.type in ['income', 'tontine_payout']) %}
+        <div class="tx-item">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div class="tx-icon-box {% if is_income %}tx-income{% else %}tx-expense{% endif %}">
+              {% if is_income %}↑{% else %}↓{% endif %}
+            </div>
+            <div>
+              <div style="font-size:0.875rem; font-weight:700; color:#ffffff;">{{ tx.description }}</div>
+              <div style="font-size:0.7rem; color:#94a3b8;">{{ tx.category }} • {{ tx.date|date_fr }}</div>
+            </div>
+          </div>
+          <div style="font-size:0.9rem; font-weight:800; color:{% if is_income %}#34d399{% else %}#ffffff{% endif %};">
+            {% if is_income %}+{% else %}-{% endif %}{{ tx.amount|currency(profile.currency) }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
