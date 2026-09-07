@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 <!-- Hero Card: Solde & Actions -->
@@ -20,7 +20,7 @@
         <span>Revenus mensuels :</span>
         <strong style="color:#ffffff;">{{ profile.monthly_income|currency(profile.currency) }}</strong>
         <span style="margin:0 0.4rem;">•</span>
-        <span>Série : <strong style="color:#fde68a;">{{ profile.streak_days }} jours 🔥</strong></span>
+        <span>Série : <strong style="color:#fde68a;">{{ profile.streak_days }} jours</strong></span>
       </div>
     </div>
 
@@ -49,7 +49,7 @@
       <div class="metric-val" style="color:#d97706;">{{ next_payment.amount|currency(profile.currency) }}</div>
       <div class="metric-desc">{{ next_payment.tontine_name }} • {{ next_payment.due_date|date_fr }}</div>
     {% else %}
-      <div class="metric-val" style="color:#059669;">À jour ✓</div>
+      <div class="metric-val" style="color:#059669;">A jour</div>
       <div class="metric-desc">Toutes les cotisations réglées</div>
     {% endif %}
   </div>

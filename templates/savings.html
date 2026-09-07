@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
@@ -63,7 +63,7 @@
     <div style="margin-top:1.25rem;">
       {% if is_completed %}
         <div style="padding:0.65rem; background:rgba(5, 150, 105, 0.2); color:#34d399; border:1px solid rgba(5, 150, 105, 0.4); text-align:center; border-radius:10px; font-weight:700; font-size:0.85rem;">
-          Objectif Atteint ✓
+          Objectif Atteint
         </div>
       {% else %}
         <form action="/api/goals/{{ goal.id }}/deposit" method="POST" style="display:flex; gap:0.5rem; margin:0;">

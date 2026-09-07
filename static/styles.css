@@ -1,4 +1,6 @@
-﻿/* Tontine Hero - Fully Responsive Mobile & Desktop Fintech Design */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* Tontine Hero - Fully Responsive Mobile & Desktop Fintech Design */
 :root {
   --primary: #059669;
   --primary-dark: #047857;
@@ -22,7 +24,7 @@ html, body {
   overflow-x: hidden;
   background-color: var(--bg);
   color: var(--text-main);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-tap-highlight-color: transparent;
   line-height: 1.5;
 }
